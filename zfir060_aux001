@@ -1,0 +1,96 @@
+*&---------------------------------------------------------------------*
+*& Report zfir060_aux001
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+report zfir060_aux001.
+
+tables: t001,zbv_bsxd_v,zbvbpname,kna1.
+
+
+data: gt_bsxd type table of zfir060_a001_alv,
+      gs_bsxd like line of gt_bsxd.
+
+field-symbols: <fs_bsxd> type zfir060_a001_alv.
+
+data: gr_alv       type ref to cl_salv_table,
+      gr_functions
+        type ref to cl_salv_functions_list.
+
+data: lr_layout type ref to cl_salv_layout,
+      ls_key    type salv_s_layout_key.
+select-options: s_bukrs for t001-bukrs,
+                s_kunnr for kna1-kunnr.
+parameters: p_date type datum default sy-datum obligatory.
+parameters: p_layout type slis_vari.
+
+parameters:
+  r_r001 radiobutton group r1, " //Posting Date
+  r_r002 radiobutton group r1, " //Base Line Date
+  r_r003 radiobutton group r1. " // Net Due Date
+
+
+start-of-selection.
+* select data in internal table
+
+  select        * from   zbv_bsxd_v
+    into corresponding fields of table gt_bsxd
+  where  bukrs in s_bukrs
+    and  budat <= p_date
+    and  ( augdt = '00000000' or augdt > p_date ).
+
+  loop at gt_bsxd assigning <fs_bsxd>.
+
+    if r_r001 = 'X'.
+      <fs_bsxd>-verzn = p_date - <fs_bsxd>-budat.
+    endif.
+    if r_r002 = 'X' and <fs_bsxd>-zfbdt is not initial.
+      <fs_bsxd>-verzn = p_date - <fs_bsxd>-zfbdt.
+    endif.
+    if r_r003 = 'X' and <fs_bsxd>-zfbdt is not initial .
+      <fs_bsxd>-faedt = <fs_bsxd>-zfbdt + <fs_bsxd>-zbd1t.
+      check <fs_bsxd>-faedt < '20451231'.
+      <fs_bsxd>-verzn = p_date - <fs_bsxd>-faedt.
+    endif.
+  endloop.
+
+* create the ALV object
+  cl_salv_table=>factory(
+    importing
+      r_salv_table   = gr_alv
+    changing
+      t_table        = gt_bsxd
+         ).
+
+* set default set of generic functions
+  gr_functions = gr_alv->get_functions( ).
+  gr_functions->set_all( ).
+
+* get the LAYOUT object
+  lr_layout = gr_alv->get_layout( ).
+* set the layout key
+  ls_key-report = sy-cprog.
+  lr_layout->set_key( value = ls_key ).
+
+* set save restriction
+*  (none restriction is intended, so we may use the default)
+  lr_layout->set_save_restriction(
+    value  = if_salv_c_layout=>restrict_none
+         ).
+
+* allow setting a default layout
+  lr_layout->set_default( value = 'X' ).
+
+* set initial layout
+  if p_layout is not initial.
+    lr_layout->set_initial_layout( value = p_layout ).
+  endif.
+* Customized Toolbar
+*从程序 SAPLSALV_METADATA_STATUS 复制 SALV_TABLE_STANDARD, 否则会报错（对象不存在）
+  call method gr_alv->set_screen_status
+    exporting
+      pfstatus = 'SALV_TABLE_STANDARD'
+      report   = sy-repid.
+
+* display it!
+  gr_alv->display( ).
