@@ -1,0 +1,232 @@
+@AbapCatalog.sqlViewName: 'ZBV_BSXD_V'
+@AbapCatalog.compiler.compareFilter: true
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: '应收账款行项目'
+define view ZBV_BSXD_DDL
+  as select from    bseg       as i
+    left outer join bkpf       as h     on  h.mandt = i.mandt
+                                        and h.bukrs = i.bukrs
+                                        and h.gjahr = i.gjahr
+                                        and h.belnr = i.belnr
+    left outer join ZBV_BPNAME as _bp   on  _bp.mandt   = i.mandt
+                                        and _bp.partner = i.kunnr
+{
+  key i.mandt,
+  key i.bukrs,
+  key i.kunnr,
+  key i.umsks,
+  key i.umskz,
+  key i.augdt,
+  key i.augbl,
+  key i.zuonr,
+  key i.gjahr,
+  key i.belnr,
+  key i.buzei,
+      _bp.BName,
+      i.h_budat                                              as budat,
+      i.h_bldat                                              as bldat,
+      h.cpudt,
+      @Semantics.currencyCode
+      i.h_waers                                              as waers,
+      h.xblnr,
+      i.h_blart                                              as blart,
+      i.h_monat                                              as monat,
+      i.bschl,
+      i.zumsk,
+      i.shkzg,
+      i.gsber,
+      i.mwskz,
+      @Semantics.amount.currencyCode: 'T001.WAERS'
+      case i.shkzg
+        when 'H' then i.dmbtr * -1
+        else i.dmbtr
+        end                                                  as dmbtr,
+      @Semantics.amount.currencyCode: 'BKPF.WAERS'
+      case i.shkzg
+          when 'H' then i.wrbtr * -1
+          else i.wrbtr
+          end                                                as wrbtr,
+      i.sgtxt,
+      _vbak.ktext,
+      i.projn,
+      i.aufnr,
+      i.anln1,
+      i.anln2,
+      i.saknr,
+      i.hkont,
+      i.fkont,
+      i.filkd,
+      i.zfbdt,
+      i.zterm,
+      i.zbd1t,
+      i.zbd2t,
+      i.zbd3t,
+      i.zbd1p,
+      i.zbd2p,
+      @Semantics.amount.currencyCode: 'BKPF.WAERS'
+      i.skfbt,
+      @Semantics.amount.currencyCode: 'T001.WAERS'
+      i.sknto,
+      @Semantics.amount.currencyCode: 'BKPF.WAERS'
+      i.wskto,
+      i.zlsch,
+      i.zlspr,
+      i.zbfix,
+      i.hbkid,
+      i.bvtyp,
+      i.rebzg,
+      i.rebzj,
+      i.rebzz,
+      i.samnr,
+      i.anfbn,
+      i.anfbj,
+      i.anfbu,
+      i.anfae,
+      i.mansp,
+      i.mschl,
+      i.madat,
+      i.manst,
+      i.maber,
+      h.xnetb,
+      i.xanet,
+      i.xcpdd,
+      i.xinve,
+      i.xzahl,
+      i.mwsk1,
+      i.h_bstat                                              as bstat,
+      i.vbund,
+      i.vbeln,
+      i.rebzt,
+      '        '                                             as infae,
+      i.stceg,
+      i.egbld,
+      i.eglld,
+      i.rstgr,
+      ''                                                     as xnoza,
+      i.vertt,
+      i.vertn,
+      i.vbewa,
+      i.wverw,
+      i.projk,
+      i.fipos,
+      i.nplnr,
+      i.aufpl,
+      i.aplzl,
+      i.xegdr,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.dmbe2,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.dmbe3,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.dmb21,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.dmb22,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.dmb23,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.dmb31,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.dmb32,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.dmb33,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.bdif3,
+      i.xragl,
+      i.uzawe,
+      h.xstov,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.mwst2,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.mwst3,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.sknt2,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.sknt3,
+      i.xref1,
+      i.xref2,
+      case i._dataaging when '00000000' then '' else 'X' end as xarch,
+      @Semantics.currencyCode
+      i.pswsl,
+      @Semantics.amount.currencyCode: 'PSWSL'
+      i.pswbt,
+      i.lzbkz,
+      i.landl,
+      i.imkey,
+      i.vbel2,
+      '000000'                                               as vpos2,
+      i.posn2,
+      i.eten2,
+      i.fistl,
+      i.geber,
+      i.dabrz,
+      i.xnegp,
+      i.kostl,
+      i.rfzei,
+      i.kkber,
+      i.empfb,
+      i.prctr,
+      i.xref3,
+      i.qsskz,
+      i.zinkz,
+      i.dtws1,
+      i.dtws2,
+      i.dtws3,
+      i.dtws4,
+      i.xpypr,
+      i.kidno,
+      @Semantics.amount.currencyCode: 'T014.WAERS'
+      i.absbt,
+      i.ccbtc,
+      @Semantics.currencyCode
+      i.pycur,
+      @Semantics.amount.currencyCode: 'PYCUR'
+      i.pyamt,
+      i.bupla,
+      i.secco,
+      i.cession_kz,
+      @Semantics.amount.currencyCode: 'T001.WAERS'
+      i.ppdiff,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE2'
+      i.ppdif2,
+      @Semantics.amount.currencyCode: 'BKPF.HWAE3'
+      i.ppdif3,
+      i.kblnr,
+      i.kblpos,
+      i.grant_nbr,
+      i.gmvkz,
+      i.srtype,
+      h.lotkz,
+      case i.fkber_long when ' '
+        then i.fkber
+        else i.fkber_long
+      end                                                    as fkber,
+      i.intreno,
+      i.pprct,
+      i.buzid,
+      i.auggj,
+      i.hktid,
+      i.budget_pd,
+      i.pays_prov,
+      i.pays_tran,
+      i.mndid,
+      i._dataaging,
+      i.kontt,
+      i.kontl,
+      cast('00000000' as abap.dats(8))                       as uebgdat,
+      i.vname,
+      i.egrup,
+      i.btype,
+      h.propmano,
+      //<$VF_PREFIX>
+      //<$FIELDS_PREFIX>
+      //<$VF_PREFIX>
+      i.gkont,
+      i.gkart,
+      i.ghkon
+      /* , i.kontt,  i.kontl, '00000000'  as uebgdat, i.vname, i.egrup,
+      i.btype,  h.propmano */
+}
+where
+      i.koart   =  'D'
+  and i.h_bstat <> 'D'
+  and i.h_bstat <> 'M'
