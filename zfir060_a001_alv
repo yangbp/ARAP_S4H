@@ -1,0 +1,27 @@
+@EndUserText.label : 'ZFIR060 Output Layout'
+@AbapCatalog.enhancementCategory : #EXTENSIBLE_CHARACTER_NUMERIC
+define structure zfir060_a001_alv {
+  bukrs : bukrs;
+  gjahr : gjahr;
+  belnr : belnr_d;
+  buzei : buzei;
+  blart : blart;
+  kunnr : kunnr;
+  bname : name1;
+  budat : budat;
+  zuonr : dzuonr;
+  sgtxt : sgtxt;
+  ktext : zktext;
+  vbel2 : vbeln;
+  posn2 : posnr;
+  waers : waers;
+  @Semantics.amount.currencyCode : 'zfir060_a001_alv.waers'
+  wrbtr : wrbtr;
+  @Semantics.amount.currencyCode : 't001.waers'
+  dmbtr : dmbtr;
+  zfbdt : dzfbdt;
+  zbd1t : dzbd1t;
+  faedt : faedt_fpos;
+  verzn : verzn;
+
+}
