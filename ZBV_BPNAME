@@ -1,0 +1,47 @@
+@AbapCatalog.sqlViewName: 'ZBVBPNAME'
+@AbapCatalog.compiler.compareFilter: true
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'BP Name'
+define view ZBV_BPNAME
+  as select from    but000       as _but000
+    left outer join but020       as _but020   on _but000.partner = _but020.partner
+    left outer join adrc         as _adrc     on _but020.addrnumber = _adrc.addrnumber
+    left outer join adr2                      on  _but020.addrnumber = adr2.addrnumber
+                                              and adr2.r3_user       = '3'
+
+    
+    left outer join bp001        as _bp001    on _but000.partner = _bp001.partner
+    left outer join but021_fs    as _but021fs on  _but000.partner  = _but021fs.partner
+                                              and _adrc.addrnumber = _but021fs.addrnumber
+  association [0..1] to adr6 as _adr6 on _but020.addrnumber = _adr6.addrnumber
+  association [0..1] to dfkkbptaxnum as _tax      on _but000.partner = _tax.partner
+
+{
+  _but000.partner,
+  _but000.bu_sort1,
+  _but000.bu_sort2,
+  _but000.title_let,
+  //  _but000.name_org1,
+  //  _but000.name_grp1,
+  case name_org1
+   when '' then _but000.name_grp1
+   else _but000.name_org1
+   end            as BName,
+  _but020.addrnumber,
+  _but020.adext,
+  _bp001.vbund,
+  _bp001.vip,
+  _adrc.tel_number,
+  _adrc.street,
+  _adrc.city1,
+  _adrc.fax_number,
+  adr2.tel_number as mobilephone,
+  _adr6[flgdefault = 'X'].smtp_addr,
+  coalesce(_tax[taxtype = 'CN0'].taxtype,_tax[taxtype = ''].taxtype) as taxtype,
+  coalesce(_tax[taxtype = 'CN0'].taxnumxl,_tax[taxtype = ''].taxnumxl) as taxnumxl,
+  coalesce(_tax[taxtype = 'CN0'].taxnum,_tax[taxtype = ''].taxnum) as taxnum,
+  _but021fs.adr_kind
+  //  COALESCE(_but000.name_org1,_but000.name_grp1) as BNAME
+}
+where
+  _but021fs.adr_kind = 'XXDEFAULT'
